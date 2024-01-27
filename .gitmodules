@@ -1,0 +1,3 @@
+[submodule "server/model/pretrained"]
+	path = server/model/pretrained
+	url = https://github.com/kinivi/hand-gesture-recognition-mediapipe
