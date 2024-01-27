@@ -3,7 +3,7 @@ from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import cv2
-import time
+from time import time_ns
 import vision_gui
 import threading
 
@@ -50,7 +50,7 @@ with GestureRecognizer.create_from_options(options) as recognizer:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
 
         # Convert the BGR image to RGB and process it with MediaPipe Gesture Recognizer
-        results = recognizer.recognize_async(mp_image, time.time_ns() // 1_000_000)
+        results = recognizer.recognize_async(mp_image, time_ns() // 1_000_000)
 
         # Draw the hand annotations on the image.
         if recognition_result_list != []:
