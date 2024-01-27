@@ -1,0 +1,4 @@
+matplotlib==3.8.2
+mediapipe==0.10.9
+opencv_contrib_python==4.9.0.80
+PyAutoGUI==0.9.54
