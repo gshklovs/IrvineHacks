@@ -6,6 +6,13 @@ import cv2
 import time
 import threading
 from socket_service import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+model_path = os.getenv("MODEL_FILE_URI")
+if model_path == None:
+    model_path = "model/gesture_recognizer.task"
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -29,7 +36,7 @@ def print_result(recognition_result: GestureRecognizerResult, output_image: mp.I
 
 def start_camera():
     options = GestureRecognizerOptions(
-        base_options=BaseOptions(model_asset_path='model/gesture_recognizer.task'),
+        base_options=BaseOptions(model_asset_path=model_path),
         running_mode=VisionRunningMode.LIVE_STREAM,
         num_hands=1,
         min_hand_detection_confidence=0.4,
