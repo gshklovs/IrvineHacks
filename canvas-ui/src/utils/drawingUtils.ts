@@ -1,7 +1,6 @@
 export const drawHoverCircle = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
-  x: number,
-  y: number,
+  hands: Array<Object>,
 ) => {
   if (canvasRef.current) {
     let canvas = canvasRef.current;
@@ -9,11 +8,17 @@ export const drawHoverCircle = (
     let height = canvas?.height;
     let ctx = canvas ? canvas.getContext("2d") : null;
     if (ctx) {
-      ctx.strokeStyle = "red";
-      ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.arc(x * width, y * height, 16, 0, 2 * Math.PI);
-      ctx.stroke();
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < hands.length; i++) {
+        let hand = hands[i];
+        let x = hand.x;
+        let y = hand.y;
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.arc(x * width, y * height, 16, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
     }
   }
 };

@@ -86,11 +86,10 @@ function App() {
       if (json[i]["gesture"] == "Closed_Fist") {
         drawLine(canvasRef, x, y, i);
       } else {
-        drawHoverCircle(transparentCanvasRef, x, y);
         lastCoords[i] = { x: x, y: y };
       }
     }
-    clearTransparentCanvas(transparentCanvasRef);
+    drawHoverCircle(transparentCanvasRef, json);
   });
 
   const DebugJsonComponent = ({ json }) => {
