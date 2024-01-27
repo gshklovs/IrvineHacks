@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
 import { BACKEND_SOCKET_URL } from "./consts/config";
 import getObjectFitSize from "./utils/getObjectFitSize";
+import { clear } from "console";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -73,7 +74,11 @@ function App() {
     }
   };
 
-  const drawPoint = (x: number, y: number) => {
+  const drawPoint = (
+    canvasRef: React.RefObject<HTMLCanvasElement>,
+    x: number,
+    y: number,
+  ) => {
     if (canvasRef.current) {
       let canvas = canvasRef.current;
       let ctx = canvas ? canvas.getContext("2d") : null;
@@ -82,7 +87,7 @@ function App() {
       if (ctx) {
         ctx.beginPath();
         ctx.fillStyle = "black";
-        ctx.fillRect(x * width, y * height, 1, 1);
+        ctx.fillRect(x * width, y * height, 4, 4);
         ctx.stroke();
       }
     }
@@ -99,15 +104,33 @@ function App() {
     }
   };
 
+  const clearTransparentCanvas = (
+    transparentCanvasRef: React.RefObject<HTMLCanvasElement>,
+  ) => {
+    if (transparentCanvasRef.current) {
+      let canvas = transparentCanvasRef.current;
+      let ctx = canvas ? canvas.getContext("2d") : null;
+      let width = canvas?.width;
+      let height = canvas?.height;
+      if (ctx) {
+        ctx.clearRect(0, 0, width, height);
+      }
+    }
+  };
+
   socket.on("from-server", (msg) => {
     setServerMessage(msg);
     toast({
       title: "Server message",
       description: msg,
     });
-    console.log("msg", msg);
     var json = JSON.parse(msg);
-    drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
+    if (json["gesture"] == "Closed_Fist") {
+      drawPoint(canvasRef, json["x"], json["y"]);
+      clearTransparentCanvas(transparentCanvasRef);
+    } else {
+      drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
+    }
   });
 
   React.useEffect(() => {
@@ -124,7 +147,7 @@ function App() {
               Canvas
             </h1>
             <div className="absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
-              <p className="text-2xl text-white opacity-100">Legend</p>
+              <p className=" z-2 text-2xl text-white opacity-100">Legend</p>
             </div>
             <p className="mt-4">
               Server: <span>{serverMessage}</span>
@@ -135,16 +158,19 @@ function App() {
             <div className="mt-2">
               <Button onClick={displayImage}>Display Image</Button>
             </div>
-            <canvas
-              id="canvas"
-              ref={canvasRef}
-              className="relative mx-40 aspect-video min-w-[70%] bg-stone-200"
-            />
-            <canvas
-              id="transparentCanvas"
-              ref={transparentCanvasRef}
-              className="relative top-0 z-10 mx-40 aspect-video h-full min-w-[70%] bg-green-500"
-            />
+            <div className=" h-[54rem] w-[96rem]">
+              <canvas
+                id="canvas"
+                ref={canvasRef}
+                className="absolute z-0 mx-20 h-[36rem] w-[64rem] bg-stone-200"
+              />
+              <canvas
+                id="transparentCanvas"
+                ref={transparentCanvasRef}
+                className="z-1 absolute mx-20 h-[36rem] w-[64rem]"
+              />
+            </div>
+
             {src && (
               <>
                 <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
