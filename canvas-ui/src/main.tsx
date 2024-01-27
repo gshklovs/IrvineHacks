@@ -4,11 +4,16 @@ import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import { Toaster } from "./components/ui/toaster.tsx";
+import ComponentTesting from "./pages/ComponentTesting.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/testing",
+    element: <ComponentTesting />,
   },
 ]);
 
