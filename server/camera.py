@@ -105,7 +105,7 @@ def start_camera():
                     # create a line whos length is 100 * the y value of the first landmark
                     cv2.line(annotated_image, (50, 250), (50, 250 + int(hand_landmarks[0].y * 100)), (0, 0, 0), 2)
 
-                    coordinate_list.append([hand_center_x, hand_center_y, datetime.utcnow()])
+                    coordinate_list.append([hand_center_x, hand_center_y, top_gesture.category_name, datetime.utcnow()])
                     # ws_send_message("{\"x\": " + str(hand_center_x) + ", \"y\": " + str(hand_center_y) + "}")
                     
                     recognition_result_list.clear()
@@ -126,10 +126,10 @@ def send_coordinates():
     while True:
         if coordinate_list != []:
             coordinate = coordinate_list.pop()
-            ttl = (datetime.utcnow() - coordinate[2]).total_seconds() * 1000
+            ttl = (datetime.utcnow() - coordinate[3]).total_seconds() * 1000
             if ttl < float(polling_rate):
-                ws_send_message("{\"x\": " + str(coordinate[0]) + ", \"y\": " + str(coordinate[1]) + "}")
-                print("sent coordinates: (" + str(coordinate[0]) + "," + str(coordinate[1]) + ")")
+                ws_send_message("{\"x\": " + str(coordinate[0]) + ", \"y\": " + str(coordinate[1]) + ", \"gesture\": " + str(coordinate[2]) + "}")
+                print("sent coordinates: (" + str(coordinate[0]) + "," + str(coordinate[1]) + ") - Gesture: " + str(coordinate[2]) + " - TTL: " + str(ttl) + "ms")
             else:
                 print("coordinates expired, clearing stack")
                 coordinate_list.clear()
