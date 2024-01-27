@@ -9,7 +9,6 @@ export const drawHoverCircle = (
     let height = canvas?.height;
     let ctx = canvas ? canvas.getContext("2d") : null;
     if (ctx) {
-      ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = "red";
       ctx.beginPath();
       ctx.lineWidth = 2;

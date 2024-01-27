@@ -20,7 +20,7 @@ const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
-  const [showDebug, setShowDebug] = React.useState(true);
+  const [showDebug, setShowDebug] = React.useState(false);
   const [src, setSrc] = React.useState("");
 
   const sendToServer = () => {
@@ -40,6 +40,7 @@ function App() {
     canvasRef: React.RefObject<HTMLCanvasElement>,
     x: number,
     y: number,
+    i: number,
   ) => {
     if (canvasRef.current) {
       let canvas = canvasRef.current;
@@ -51,12 +52,11 @@ function App() {
         ctx.strokeStyle = "red";
         ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(lastCoords.x * width, lastCoords.y * height);
+        ctx.moveTo(lastCoords[i].x * width, lastCoords[i].y * height);
         ctx.lineTo(x * width, y * height);
         ctx.stroke();
       }
-      lastCoords.x = x;
-      lastCoords.y = y;
+      lastCoords[i] = { x: x, y: y };
     }
   };
 
@@ -74,15 +74,23 @@ function App() {
   socket.on("from-server", (msg) => {
     var json = JSON.parse(msg);
     setServerJSON(json);
-    // console.log(json);
-    // if (json["gesture"] == "Closed_Fist") {
-    //   drawLine(canvasRef, json["x"], json["y"]);
-    //   clearTransparentCanvas(transparentCanvasRef);
-    // } else {
-    //   drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
-    //   lastCoords.x = json["x"];
-    //   lastCoords.y = json["y"];
-    // }
+    var cur_hand;
+    var x: number;
+    var y: number;
+    // if there are elemnts in th json array log them
+    // make a for loop for each json object
+    for (var i = 0; i < json.length; i++) {
+      cur_hand = json[i];
+      x = cur_hand["x"];
+      y = cur_hand["y"];
+      if (json[i]["gesture"] == "Closed_Fist") {
+        drawLine(canvasRef, x, y, i);
+      } else {
+        drawHoverCircle(transparentCanvasRef, x, y);
+        lastCoords[i] = { x: x, y: y };
+      }
+    }
+    clearTransparentCanvas(transparentCanvasRef);
   });
 
   const DebugJsonComponent = ({ json }) => {
