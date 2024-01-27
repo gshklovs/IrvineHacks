@@ -29,9 +29,9 @@ def print_result(recognition_result: GestureRecognizerResult, output_image: mp.I
 
 
 options = GestureRecognizerOptions(
-    base_options=BaseOptions(model_asset_path='gesture_recognizer.task'),
+    base_options=BaseOptions(model_asset_path='/Users/grisha/Documents/conda/IrvineHacks/Computer Vision/gesture_recognizer.task'),
     running_mode=VisionRunningMode.LIVE_STREAM,
-    num_hands=2,
+    num_hands=1,
     min_hand_detection_confidence=0.4,
     min_hand_presence_confidence=0.5,
     min_tracking_confidence=0.5,
