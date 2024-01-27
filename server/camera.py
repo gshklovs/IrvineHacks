@@ -129,7 +129,7 @@ def send_coordinates():
             ttl = (datetime.utcnow() - coordinate[3]).total_seconds() * 1000
             if ttl < float(polling_rate):
                 ws_send_message("{\"x\": " + str(coordinate[0]) + ", \"y\": " + str(coordinate[1]) + ", \"gesture\": \"" + str(coordinate[2]) + "\", \"timestamp\": \"" + str(coordinate[3]) + "\"}")
-                print("sent coordinates: (" + str(coordinate[0]) + "," + str(coordinate[1]) + ") - Gesture: " + str(coordinate[2]) + " - TTL: " + str(ttl) + "ms")
+                print("sent coordinates: (" + str(coordinate[0]) + "," + str(coordinate[1]) + ") - Gesture: " + str(coordinate[2]) + " - Age: " + str(ttl) + "ms")
             else:
                 print("coordinates expired, clearing stack")
                 coordinate_list.clear()

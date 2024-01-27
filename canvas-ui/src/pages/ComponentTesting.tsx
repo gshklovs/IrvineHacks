@@ -1,30 +1,20 @@
-import "./App.css";
 import React from "react";
-import { useToast } from "./components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 import { io } from "socket.io-client";
-import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL } from "./consts/config";
-import getObjectFitSize from "./utils/getObjectFitSize";
-import openPalm from "./assets/open_palm.png";
-import closedFist from "./assets/closed_fist.png";
-import { clear } from "console";
+import { Button } from "@/components/ui/button";
+import { BACKEND_SOCKET_URL } from "@/consts/config";
+import getObjectFitSize from "@/utils/getObjectFitSize";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
-function App() {
+function ComponentTesting() {
   const { toast } = useToast();
+  const [serverMessage, setServerMessage] = React.useState("");
   const [serverJSON, setServerJSON] = React.useState({} as any);
-  const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
 
   const sendToServer = () => {
     socket.emit("to-server", "hello");
-    toast({
-      title: "Success",
-      description: "Sent message to server",
-      duration: 5000,
-    });
   };
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -82,11 +72,7 @@ function App() {
     }
   };
 
-  const drawPoint = (
-    canvasRef: React.RefObject<HTMLCanvasElement>,
-    x: number,
-    y: number,
-  ) => {
+  const drawPoint = (x: number, y: number) => {
     if (canvasRef.current) {
       let canvas = canvasRef.current;
       let ctx = canvas ? canvas.getContext("2d") : null;
@@ -95,7 +81,7 @@ function App() {
       if (ctx) {
         ctx.beginPath();
         ctx.fillStyle = "black";
-        ctx.fillRect(x * width, y * height, 4, 4);
+        ctx.fillRect(x * width, y * height, 1, 1);
         ctx.stroke();
       }
     }
@@ -112,29 +98,12 @@ function App() {
     }
   };
 
-  const clearTransparentCanvas = (
-    transparentCanvasRef: React.RefObject<HTMLCanvasElement>,
-  ) => {
-    if (transparentCanvasRef.current) {
-      let canvas = transparentCanvasRef.current;
-      let ctx = canvas ? canvas.getContext("2d") : null;
-      let width = canvas?.width;
-      let height = canvas?.height;
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
-      }
-    }
-  };
-
   socket.on("from-server", (msg) => {
+    setServerMessage(msg);
+    console.log("msg", msg);
     var json = JSON.parse(msg);
     setServerJSON(json);
-    if (json["gesture"] == "Closed_Fist") {
-      drawPoint(canvasRef, json["x"], json["y"]);
-      clearTransparentCanvas(transparentCanvasRef);
-    } else {
-      drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
-    }
+    drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
   });
 
   React.useEffect(() => {
@@ -148,48 +117,38 @@ function App() {
         <div className="h-screen w-full overflow-y-auto bg-black">
           <div className="flex flex-col p-16">
             <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
-              Canvas
+              Component Testing
             </h1>
-            <div className="z-2 absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
+            <div className="absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
               <p className="text-2xl text-white opacity-100">Legend</p>
-              <p className="text-white opacity-100">Find your cursor: </p>
-              <img className="invert" src={openPalm} />
-              <p className="text-white opacity-100">Draw: </p>
-              <img className="w-10 invert" src={closedFist} />
             </div>
-            <div className="flex flex-row">
-              <div className="m-1">
-                <Button
-                  onClick={() => setShowDebug(!showDebug)}
-                  variant="secondary"
-                >
-                  {showDebug ? "Hide" : "Show"} Debug
-                </Button>
-              </div>
-              <div className="m-1">
-                <Button onClick={sendToServer} variant="secondary">
-                  Send Message
-                </Button>
-              </div>
-              <div className="m-1">
-                <Button onClick={displayImage} variant="secondary">
-                  Display Image
-                </Button>
-              </div>
+            <pre className="mt-4">
+              Debug: {"{"}
+              {Object.keys(serverJSON).map((key, index) => (
+                <p className="ml-4" key={index}>
+                  {key}: {serverJSON[key]}
+                </p>
+              ))}
+              {"}"}
+              <br />
+              Last Message: {new Date(serverJSON["timestamp"]).toLocaleString()}
+            </pre>
+            <div className="mt-2">
+              <Button onClick={sendToServer}>Send</Button>
             </div>
-            <div className=" h-[54rem] w-[96rem]">
-              <canvas
-                id="canvas"
-                ref={canvasRef}
-                className="absolute z-0 h-[36rem] w-[64rem] bg-stone-200"
-              />
-              <canvas
-                id="transparentCanvas"
-                ref={transparentCanvasRef}
-                className="z-1 absolute h-[36rem] w-[64rem]"
-              />
+            <div className="mt-2">
+              <Button onClick={displayImage}>Display Image</Button>
             </div>
-
+            <canvas
+              id="canvas"
+              ref={canvasRef}
+              className="relative mx-40 hidden aspect-video min-w-[70%] bg-stone-200"
+            />
+            <canvas
+              id="transparentCanvas"
+              ref={transparentCanvasRef}
+              className="relative top-0 z-10 mx-40 aspect-video h-full min-w-[70%] bg-white"
+            />
             {src && (
               <>
                 <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
@@ -208,4 +167,4 @@ function App() {
   );
 }
 
-export default App;
+export default ComponentTesting;
