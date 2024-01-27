@@ -4,8 +4,22 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import cv2
 import time
+from datetime import datetime
 import threading
 from socket_service import *
+import os
+from dotenv import load_dotenv
+
+# ====== ENV VARIABLES ====== #
+load_dotenv()
+model_path = os.getenv("MODEL_FILE_URI")
+if model_path == None:
+    model_path = "model/gesture_recognizer.task"
+
+polling_rate = os.getenv("POLLING_RATE")
+if polling_rate == None:
+    polling_rate = 100
+# ============================ #
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -18,6 +32,8 @@ GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 recognition_result_list = []
+coordinate_list = []
+
 # Create a gesture recognizer instance with the live stream mode:
 def print_result(recognition_result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
     # print('gesture recognition result: {}'.format(recognition_result))
@@ -29,7 +45,7 @@ def print_result(recognition_result: GestureRecognizerResult, output_image: mp.I
 
 def start_camera():
     options = GestureRecognizerOptions(
-        base_options=BaseOptions(model_asset_path='./model/gesture_recognizer.task'),
+        base_options=BaseOptions(model_asset_path='model/gesture_recognizer.task'),
         running_mode=VisionRunningMode.LIVE_STREAM,
         num_hands=1,
         min_hand_detection_confidence=0.4,
@@ -56,9 +72,8 @@ def start_camera():
             if recognition_result_list != []:
                 recognition_result = recognition_result_list.pop()
                 # print(recognition_result.gestures)
-                # if recognition_result.gestures:
-                    # print(recognition_result.gestures[0][0])
                 if recognition_result.gestures:
+                    send_coordinates = True
                     top_gesture = recognition_result.gestures[0][0]
                     hand_landmarks = recognition_result.hand_landmarks[0]
 
@@ -90,12 +105,9 @@ def start_camera():
                     # create a line whos length is 100 * the y value of the first landmark
                     cv2.line(annotated_image, (50, 250), (50, 250 + int(hand_landmarks[0].y * 100)), (0, 0, 0), 2)
 
-                    # print(f"({hand_center_x}, {hand_center_y})")
-                    ws_send_message("{\"x\": " + str(hand_center_x) + ", \"y\": " + str(hand_center_y) + "}")
-
-                    # gui_thread = threading.Thread(target=Gui.check_input, args=(top_gesture.category_name, (hand_center_x, hand_center_y), (annotated_image.shape[1], annotated_image.shape[0])))
-                    # gui_thread.start()
-                    # Gui.check_input(top_gesture.category_name, (hand_center_x, hand_center_y), (annotated_image.shape[1], annotated_image.shape[0]))
+                    coordinate_list.append([hand_center_x, hand_center_y, datetime.utcnow()])
+                    # ws_send_message("{\"x\": " + str(hand_center_x) + ", \"y\": " + str(hand_center_y) + "}")
+                    
                     recognition_result_list.clear()
                     image = annotated_image
                 #     cv2.imshow(f"Annotated Frame", annotated_image)
@@ -104,8 +116,21 @@ def start_camera():
                 #     mp.solutions.drawing_utils.draw_landmarks(
                 #         image, hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS)
 
-        
             cv2.imshow('MediaPipe Gesture Recognizer', image)
             if cv2.waitKey(5) & 0xFF == 27:
                 break
         cap.release()
+
+def send_coordinates():
+    global coordinate_list
+    while True:
+        if coordinate_list != []:
+            coordinate = coordinate_list.pop()
+            ttl = (datetime.utcnow() - coordinate[2]).total_seconds() * 1000
+            if ttl < float(polling_rate):
+                ws_send_message("{\"x\": " + str(coordinate[0]) + ", \"y\": " + str(coordinate[1]) + "}")
+                print("sent coordinates: (" + str(coordinate[0]) + "," + str(coordinate[1]) + ")")
+            else:
+                print("coordinates expired, clearing stack")
+                coordinate_list.clear()
+        time.sleep(float(polling_rate) / 1000)
