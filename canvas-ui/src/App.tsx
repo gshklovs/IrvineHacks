@@ -3,18 +3,11 @@ import React from "react";
 import { useToast } from "./components/ui/use-toast";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL, handColors, lastCoords } from "./consts/config";
-import getObjectFitSize from "./utils/getObjectFitSize";
+import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
 import openPalm from "./assets/open_palm.png";
 import closedFist from "./assets/closed_fist.png";
-import getRandomColor from "./utils/getRandomColor";
 import calibrateCanvas from "./utils/calibrateCanvas";
-import {
-  drawHoverCircle,
-  drawPoint,
-  clearTransparentCanvas,
-  drawLine,
-} from "./utils/drawingUtils";
+import { drawHoverCircle, drawLine } from "./utils/drawingUtils";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -54,8 +47,6 @@ function App() {
     var cur_hand;
     var x: number;
     var y: number;
-    // if there are elemnts in th json array log them
-    // make a for loop for each json object
     for (var i = 0; i < json.length; i++) {
       cur_hand = json[i];
       x = cur_hand["x"];
