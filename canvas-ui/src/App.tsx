@@ -1,10 +1,10 @@
 import "./App.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { useToast } from "./components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL } from "./consts/config";
+import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
 import getObjectFitSize from "./utils/getObjectFitSize";
 import openPalm from "./assets/open_palm.png";
 import closedFist from "./assets/closed_fist.png";
@@ -23,11 +23,6 @@ function App() {
   const [serverJSON, setServerJSON] = React.useState({} as any);
   const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
-  // const [lastX, setLastX] = React.useState(10);
-  // const [lastY, setLastY] = React.useState(100);
-  var lastX = 0.5;
-  var lastY = 0.5;
-  console.log("Rerender");
 
   const sendToServer = () => {
     socket.emit("to-server", "hello");
@@ -47,35 +42,28 @@ function App() {
     x: number,
     y: number,
   ) => {
-    if (canvasRef.current && lastX != x && lastY != y) {
+    if (canvasRef.current) {
       let canvas = canvasRef.current;
       let ctx = canvas ? canvas.getContext("2d") : null;
       let width = canvas?.width;
       let height = canvas?.height;
-      console.log(
-        "line from ",
-        lastX.toFixed(2),
-        lastY.toFixed(2),
-        " to ",
-        x.toFixed(2),
-        y.toFixed(2),
-      );
       if (ctx) {
         //choose a random color
-        ctx.strokeStyle = getRandomColor();
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(lastX * width, lastY * height);
+        ctx.moveTo(lastCoords.x * width, lastCoords.y * height);
         ctx.lineTo(x * width, y * height);
         ctx.stroke();
       }
-      lastX = x;
-      lastY = y;
+      lastCoords.x = x;
+      lastCoords.y = y;
     }
   };
 
-  function displayImage(canvasRef: React.RefObject<HTMLCanvasElement>) {
-    if (canvasRef.current) {
-      let canvas = canvasRef.current;
+  function displayImage() {
+    if (displayRef.current) {
+      let canvas = displayRef.current;
       setSrc(canvas.toDataURL("image/png"));
       var img = new Image();
       img.src = src;
@@ -92,6 +80,8 @@ function App() {
       clearTransparentCanvas(transparentCanvasRef);
     } else {
       drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
+      lastCoords.x = json["x"];
+      lastCoords.y = json["y"];
     }
   });
 
