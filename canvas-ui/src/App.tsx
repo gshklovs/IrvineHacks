@@ -19,7 +19,7 @@ const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
-  const [serverJSON, setServerJSON] = React.useState({} as any);
+  const [serverJSON, setServerJSON] = React.useState([]);
   const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
 
@@ -74,6 +74,7 @@ function App() {
   socket.on("from-server", (msg) => {
     var json = JSON.parse(msg);
     setServerJSON(json);
+    // console.log(json);
     // if (json["gesture"] == "Closed_Fist") {
     //   drawLine(canvasRef, json["x"], json["y"]);
     //   clearTransparentCanvas(transparentCanvasRef);
@@ -84,16 +85,16 @@ function App() {
     // }
   });
 
-  const JsonComponent = (json: any) => {
+  const DebugJsonComponent = ({ json }) => {
     return (
-      <div>
+      <div className="ml-4">
         {"{"}
-        {Object.keys(json).map((key, index) => (
-          <p className="ml-4" key={index}>
+        {Object.keys(json).map((key) => (
+          <p className="ml-4" key={key}>
             {key}: {json[key]}
           </p>
         ))}
-        {"}"}
+        {"},"}
       </div>
     );
   };
@@ -142,9 +143,9 @@ function App() {
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
               Debug: {"["}
-              {/* {serverJSON.map((index) => ( */}
-              <JsonComponent {...serverJSON[0]} />
-              {/* ))} */}
+              {serverJSON.map((item, index) => {
+                return <DebugJsonComponent key={index} json={item} />;
+              })}
               {"]"}
               <br />
             </pre>

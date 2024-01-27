@@ -123,6 +123,7 @@ def start_camera():
                     break
 
 def send_coordinates():
+    last_msg = ""
     global coordinate_list
     while True:
         msg = "["
@@ -142,7 +143,9 @@ def send_coordinates():
         else:
             msg += "]"
         
-        ws_send_message(msg)
+        if msg != last_msg:
+            ws_send_message(msg)
+            last_msg = msg
         time.sleep(float(polling_rate) / 1000)
 
 def coordinate_frame_to_json(frame):
