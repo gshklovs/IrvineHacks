@@ -1,7 +1,6 @@
 import "./App.css";
-import React, { useEffect } from "react";
+import React from "react";
 import { useToast } from "./components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
 import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
@@ -75,15 +74,29 @@ function App() {
   socket.on("from-server", (msg) => {
     var json = JSON.parse(msg);
     setServerJSON(json);
-    if (json["gesture"] == "Closed_Fist") {
-      drawLine(canvasRef, json["x"], json["y"]);
-      clearTransparentCanvas(transparentCanvasRef);
-    } else {
-      drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
-      lastCoords.x = json["x"];
-      lastCoords.y = json["y"];
-    }
+    // if (json["gesture"] == "Closed_Fist") {
+    //   drawLine(canvasRef, json["x"], json["y"]);
+    //   clearTransparentCanvas(transparentCanvasRef);
+    // } else {
+    //   drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
+    //   lastCoords.x = json["x"];
+    //   lastCoords.y = json["y"];
+    // }
   });
+
+  const JsonComponent = (json: any) => {
+    return (
+      <div>
+        {"{"}
+        {Object.keys(json).map((key, index) => (
+          <p className="ml-4" key={index}>
+            {key}: {json[key]}
+          </p>
+        ))}
+        {"}"}
+      </div>
+    );
+  };
 
   React.useEffect(() => {
     calibrateCanvas(canvasRef);
@@ -128,13 +141,11 @@ function App() {
               </div>
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
-              Debug: {"{"}
-              {Object.keys(serverJSON).map((key, index) => (
-                <p className="ml-4" key={index}>
-                  {key}: {serverJSON[key]}
-                </p>
-              ))}
-              {"}"}
+              Debug: {"["}
+              {/* {serverJSON.map((index) => ( */}
+              <JsonComponent {...serverJSON[0]} />
+              {/* ))} */}
+              {"]"}
               <br />
             </pre>
             <div className="z-0 mt-4 h-[36rem] w-[64rem] border border-yellow-50">

@@ -132,6 +132,7 @@ def send_coordinates():
                 age = (datetime.utcnow() - coords[3]).total_seconds() * 1000
                 if age < float(polling_rate):
                     msg += coordinate_frame_to_json(coords) + ","
+                    print("Hand Index: " + str(i) + " - (" + str(coords[0]) + "," + str(coords[1]) + ") - Gesture: " + str(coords[2]))
                 else:
                     print("coordinates expired, clearing stack")
                     coordinate_list[i].clear()
@@ -141,7 +142,7 @@ def send_coordinates():
         else:
             msg += "]"
         
-        print(msg)
+        ws_send_message(msg)
         time.sleep(float(polling_rate) / 1000)
 
 def coordinate_frame_to_json(frame):
