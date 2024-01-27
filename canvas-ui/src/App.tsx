@@ -12,12 +12,17 @@ const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
-  const [serverMessage, setServerMessage] = React.useState("");
   const [serverJSON, setServerJSON] = React.useState({} as any);
+  const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
 
   const sendToServer = () => {
     socket.emit("to-server", "hello");
+    toast({
+      title: "Success",
+      description: "Sent message to server",
+      duration: 5000,
+    });
   };
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -120,7 +125,6 @@ function App() {
   };
 
   socket.on("from-server", (msg) => {
-    setServerMessage(msg);
     var json = JSON.parse(msg);
     setServerJSON(json);
     if (json["gesture"] == "Closed_Fist") {
@@ -147,7 +151,27 @@ function App() {
             <div className="absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
               <p className=" z-2 text-2xl text-white opacity-100">Legend</p>
             </div>
-            <pre className="mt-4">
+            <div className="flex flex-row">
+              <div className="m-1">
+                <Button
+                  onClick={() => setShowDebug(!showDebug)}
+                  variant="secondary"
+                >
+                  {showDebug ? "Hide" : "Show"} Debug
+                </Button>
+              </div>
+              <div className="m-1">
+                <Button onClick={sendToServer} variant="secondary">
+                  Send Message
+                </Button>
+              </div>
+              <div className="m-1">
+                <Button onClick={displayImage} variant="secondary">
+                  Display Image
+                </Button>
+              </div>
+            </div>
+            <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
               Debug: {"{"}
               {Object.keys(serverJSON).map((key, index) => (
                 <p className="ml-4" key={index}>
@@ -157,13 +181,7 @@ function App() {
               {"}"}
               <br />
             </pre>
-            <div className="mt-2">
-              <Button onClick={sendToServer}>Send</Button>
-            </div>
-            <div className="mt-2">
-              <Button onClick={displayImage}>Display Image</Button>
-            </div>
-            <div className=" h-[54rem] w-[96rem]">
+            <div className=" mt-4 h-[54rem] w-[96rem]">
               <canvas
                 id="canvas"
                 ref={canvasRef}
