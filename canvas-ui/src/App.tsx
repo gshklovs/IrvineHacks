@@ -177,7 +177,17 @@ function App() {
                 </Button>
               </div>
             </div>
-            <div className=" h-[54rem] w-[96rem]">
+            <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
+              Debug: {"{"}
+              {Object.keys(serverJSON).map((key, index) => (
+                <p className="ml-4" key={index}>
+                  {key}: {serverJSON[key]}
+                </p>
+              ))}
+              {"}"}
+              <br />
+            </pre>
+            <div className=" mt-4 h-[54rem] w-[96rem]">
               <canvas
                 id="canvas"
                 ref={canvasRef}
