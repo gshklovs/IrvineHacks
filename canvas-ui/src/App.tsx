@@ -19,6 +19,7 @@ function App() {
   };
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const displayRef = React.useRef<HTMLCanvasElement>(null);
 
   function calibrateCanvas(canvasRef: React.RefObject<HTMLCanvasElement>) {
@@ -51,13 +52,18 @@ function App() {
     }
   }
 
-  const drawHoverCircle = (x: number, y: number) => {
+  const drawHoverCircle = (
+    canvasRef: React.RefObject<HTMLCanvasElement>,
+    x: number,
+    y: number,
+  ) => {
     if (canvasRef.current) {
       let canvas = canvasRef.current;
       let width = canvas?.width;
       let height = canvas?.height;
       let ctx = canvas ? canvas.getContext("2d") : null;
       if (ctx) {
+        ctx.clearRect(0, 0, width, height);
         ctx.strokeStyle = "red";
         ctx.beginPath();
         ctx.lineWidth = 2;
@@ -101,11 +107,12 @@ function App() {
     });
     console.log("msg", msg);
     var json = JSON.parse(msg);
-    drawHoverCircle(json["x"], json["y"]);
+    drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
   });
 
   React.useEffect(() => {
     calibrateCanvas(canvasRef);
+    calibrateCanvas(transparentCanvasRef);
   }, []);
 
   return (
@@ -131,8 +138,13 @@ function App() {
             <canvas
               id="canvas"
               ref={canvasRef}
-              className=" mx-40 aspect-video min-w-[70%] bg-stone-200"
-            ></canvas>
+              className="relative mx-40 aspect-video min-w-[70%] bg-stone-200"
+            />
+            <canvas
+              id="transparentCanvas"
+              ref={transparentCanvasRef}
+              className="relative top-0 z-10 mx-40 aspect-video h-full min-w-[70%] bg-green-500"
+            />
             {src && (
               <>
                 <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
