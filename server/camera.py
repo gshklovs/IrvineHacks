@@ -47,7 +47,7 @@ def start_camera():
     options = GestureRecognizerOptions(
         base_options=BaseOptions(model_asset_path='model/gesture_recognizer.task'),
         running_mode=VisionRunningMode.LIVE_STREAM,
-        num_hands=1,
+        num_hands=2,
         min_hand_detection_confidence=0.4,
         min_hand_presence_confidence=0.5,
         min_tracking_confidence=0.5,
