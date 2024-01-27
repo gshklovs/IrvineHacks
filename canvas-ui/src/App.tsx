@@ -6,6 +6,8 @@ import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
 import { BACKEND_SOCKET_URL } from "./consts/config";
 import getObjectFitSize from "./utils/getObjectFitSize";
+import openPalm from "./assets/open_palm.png";
+import closedFist from "./assets/closed_fist.png";
 import { clear } from "console";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
@@ -146,8 +148,12 @@ function App() {
             <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
               Canvas
             </h1>
-            <div className="absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
-              <p className=" z-2 text-2xl text-white opacity-100">Legend</p>
+            <div className="z-2 absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
+              <p className="text-2xl text-white opacity-100">Legend</p>
+              <p className="text-white opacity-100">Find your cursor: </p>
+              <img className="invert" src={openPalm} />
+              <p className="text-white opacity-100">Draw: </p>
+              <img className="w-10 invert" src={closedFist} />
             </div>
             <p className="mt-4">
               Server: <span>{serverMessage}</span>
@@ -155,19 +161,19 @@ function App() {
             <div className="mt-2">
               <Button onClick={sendToServer}>Send</Button>
             </div>
-            <div className="mt-2">
+            <div className="my-2">
               <Button onClick={displayImage}>Display Image</Button>
             </div>
-            <div className=" h-[54rem] w-[96rem]">
+            <div className=" h-[28rem] w-[64rem]">
               <canvas
                 id="canvas"
                 ref={canvasRef}
-                className="absolute z-0 mx-20 h-[36rem] w-[64rem] bg-stone-200"
+                className="absolute z-0 h-[36rem] w-[64rem] bg-stone-200"
               />
               <canvas
                 id="transparentCanvas"
                 ref={transparentCanvasRef}
-                className="z-1 absolute mx-20 h-[36rem] w-[64rem]"
+                className="z-1 absolute h-[36rem] w-[64rem]"
               />
             </div>
 
