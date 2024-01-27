@@ -29,7 +29,7 @@ def print_result(recognition_result: GestureRecognizerResult, output_image: mp.I
 
 def start_camera():
     options = GestureRecognizerOptions(
-        base_options=BaseOptions(model_asset_path='model/gesture_recognizer.task'),
+        base_options=BaseOptions(model_asset_path='./model/gesture_recognizer.task'),
         running_mode=VisionRunningMode.LIVE_STREAM,
         num_hands=1,
         min_hand_detection_confidence=0.4,
