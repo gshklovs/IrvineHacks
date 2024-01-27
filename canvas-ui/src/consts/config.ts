@@ -14,7 +14,6 @@ export var handColors = [
   "red",
   "blue",
   "green",
-  "yellow",
   "orange",
   "purple",
   "pink",
