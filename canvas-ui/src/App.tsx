@@ -8,7 +8,13 @@ import { BACKEND_SOCKET_URL } from "./consts/config";
 import getObjectFitSize from "./utils/getObjectFitSize";
 import openPalm from "./assets/open_palm.png";
 import closedFist from "./assets/closed_fist.png";
-import { clear } from "console";
+import getRandomColor from "./utils/getRandomColor";
+import calibrateCanvas from "./utils/calibrateCanvas";
+import {
+  drawHoverCircle,
+  drawPoint,
+  clearTransparentCanvas,
+} from "./utils/drawingUtils";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -17,6 +23,11 @@ function App() {
   const [serverJSON, setServerJSON] = React.useState({} as any);
   const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
+  // const [lastX, setLastX] = React.useState(10);
+  // const [lastY, setLastY] = React.useState(100);
+  var lastX = 0.5;
+  var lastY = 0.5;
+  console.log("Rerender");
 
   const sendToServer = () => {
     socket.emit("to-server", "hello");
@@ -31,77 +42,38 @@ function App() {
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const displayRef = React.useRef<HTMLCanvasElement>(null);
 
-  function calibrateCanvas(canvasRef: React.RefObject<HTMLCanvasElement>) {
-    if (canvasRef.current) {
-      const originalHeight = canvasRef.current?.height;
-      const originalWidth = canvasRef.current?.width;
-      var myCanvas = canvasRef.current;
-      let dimensions = getObjectFitSize(
-        true,
-        myCanvas.clientWidth,
-        myCanvas.clientHeight,
-        myCanvas.width,
-        myCanvas.height,
-      );
-      const dpr = window.devicePixelRatio || 1;
-      if (canvasRef.current) {
-        canvasRef.current.width = dimensions.width * dpr;
-        canvasRef.current.height = dimensions.height * dpr;
-      }
-
-      let ctx = myCanvas.getContext("2d");
-      console.log("ctx in rescale", ctx);
-      let ratio = Math.min(
-        myCanvas.clientWidth / originalWidth,
-        myCanvas.clientHeight / originalHeight,
-      );
-      if (ctx) {
-        ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
-      }
-    }
-  }
-
-  const drawHoverCircle = (
+  const drawLine = (
     canvasRef: React.RefObject<HTMLCanvasElement>,
     x: number,
     y: number,
   ) => {
-    if (canvasRef.current) {
-      let canvas = canvasRef.current;
-      let width = canvas?.width;
-      let height = canvas?.height;
-      let ctx = canvas ? canvas.getContext("2d") : null;
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
-        ctx.strokeStyle = "red";
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.arc(x * width, y * height, 16, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-    }
-  };
-
-  const drawPoint = (
-    canvasRef: React.RefObject<HTMLCanvasElement>,
-    x: number,
-    y: number,
-  ) => {
-    if (canvasRef.current) {
+    if (canvasRef.current && lastX != x && lastY != y) {
       let canvas = canvasRef.current;
       let ctx = canvas ? canvas.getContext("2d") : null;
       let width = canvas?.width;
       let height = canvas?.height;
+      console.log(
+        "line from ",
+        lastX.toFixed(2),
+        lastY.toFixed(2),
+        " to ",
+        x.toFixed(2),
+        y.toFixed(2),
+      );
       if (ctx) {
+        //choose a random color
+        ctx.strokeStyle = getRandomColor();
         ctx.beginPath();
-        ctx.fillStyle = "black";
-        ctx.fillRect(x * width, y * height, 4, 4);
+        ctx.moveTo(lastX * width, lastY * height);
+        ctx.lineTo(x * width, y * height);
         ctx.stroke();
       }
+      lastX = x;
+      lastY = y;
     }
   };
 
-  const displayImage = () => {
+  function displayImage(canvasRef: React.RefObject<HTMLCanvasElement>) {
     if (canvasRef.current) {
       let canvas = canvasRef.current;
       setSrc(canvas.toDataURL("image/png"));
@@ -110,27 +82,13 @@ function App() {
       displayRef.current?.getContext("2d")?.drawImage(img, 0, 0);
       console.log("src", src);
     }
-  };
-
-  const clearTransparentCanvas = (
-    transparentCanvasRef: React.RefObject<HTMLCanvasElement>,
-  ) => {
-    if (transparentCanvasRef.current) {
-      let canvas = transparentCanvasRef.current;
-      let ctx = canvas ? canvas.getContext("2d") : null;
-      let width = canvas?.width;
-      let height = canvas?.height;
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
-      }
-    }
-  };
+  }
 
   socket.on("from-server", (msg) => {
     var json = JSON.parse(msg);
     setServerJSON(json);
     if (json["gesture"] == "Closed_Fist") {
-      drawPoint(canvasRef, json["x"], json["y"]);
+      drawLine(canvasRef, json["x"], json["y"]);
       clearTransparentCanvas(transparentCanvasRef);
     } else {
       drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
@@ -150,12 +108,14 @@ function App() {
             <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
               Canvas
             </h1>
-            <div className="z-2 absolute right-0 top-0 m-8 h-32 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
-              <p className="text-2xl text-white opacity-100">Legend</p>
+            <div className="z-2 absolute right-0 top-0 m-8 min-h-48 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
+              <p className="pb-2 text-2xl text-white opacity-100">
+                How to draw
+              </p>
               <p className="text-white opacity-100">Find your cursor: </p>
-              <img className="invert" src={openPalm} />
+              <img className="right-0 m-2 h-12 invert" src={openPalm} />
               <p className="text-white opacity-100">Draw: </p>
-              <img className="w-10 invert" src={closedFist} />
+              <img className=" h-16 invert" src={closedFist} />
             </div>
             <div className="flex flex-row">
               <div className="m-1">
@@ -187,11 +147,11 @@ function App() {
               {"}"}
               <br />
             </pre>
-            <div className=" mt-4 h-[54rem] w-[96rem]">
+            <div className="z-0 mt-4 h-[36rem] w-[64rem] border border-yellow-50">
               <canvas
                 id="canvas"
                 ref={canvasRef}
-                className="absolute z-0 h-[36rem] w-[64rem] bg-stone-200"
+                className="absolute z-0 h-[36rem] w-[64rem] bg-neutral-100"
               />
               <canvas
                 id="transparentCanvas"
@@ -202,7 +162,7 @@ function App() {
 
             {src && (
               <>
-                <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
+                <h1 className="mt-[100rem] w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
                   Result
                 </h1>
                 <canvas
