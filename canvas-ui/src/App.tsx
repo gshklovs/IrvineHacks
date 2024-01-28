@@ -3,7 +3,7 @@ import React from "react";
 import { useToast } from "./components/ui/use-toast";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
+import { BACKEND_SOCKET_URL, lastCoords, leader, node } from "./consts/config";
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
@@ -12,13 +12,14 @@ import {
   drawLine,
   drawLineNoRace,
 } from "./utils/drawingUtils";
+import { getNodes, registerNode } from "./utils/firebase";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
-  const [showDebug, setShowDebug] = React.useState(false);
+  const [showDebug, setShowDebug] = React.useState(true);
   const [src, setSrc] = React.useState("");
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -56,10 +57,13 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        // drawLine(canvasRef, i, x, y);
+        // drawLine(canvasRef, i, x, y);xw
         drawLineNoRace(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
+      }
+      if (node.leader) {
+        // TODO: Send canvas state to firebase
       }
     }
     drawHoverCircle(transparentCanvasRef, json);
@@ -82,6 +86,7 @@ function App() {
   React.useEffect(() => {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
+    getNodes();
   }, []);
 
   return (
@@ -122,7 +127,12 @@ function App() {
               </div>
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
-              Debug: {"["}
+              <div
+                className={`${node.leader ? "text-green-400" : "text-orange-400"}`}
+              >
+                Leader: {leader.id} {node.leader ? "(ME)" : ""}
+              </div>
+              Last Frame: {"["}
               {serverJSON.map((item, index) => {
                 return <DebugJsonComponent key={index} json={item} />;
               })}
