@@ -73,7 +73,7 @@ function App() {
         clearCanvas(canvasRef);
         shouldClearCanvas.value = false;
       }
-    }, 2000);
+    }, 1000);
   };
 
   const DebugJsonComponent = ({ json }: { json: any }) => {

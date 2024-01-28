@@ -35,7 +35,7 @@ export const registerNode = async () => {
   }
   setInterval(async () => {
     set(ref(db, "nodes/" + node.id), new Date().toJSON());
-  }, 500);
+  }, 250);
 };
 
 export const uploadState = async (state: string) => {
@@ -54,7 +54,7 @@ export const downloadState = async () => {
 // Listen for leader changes
 onValue(ref(db, "leader"), (snapshot) => {
   const data = snapshot.val();
-  console.log("leader: ", data);
+  console.log("new leader: ", data);
   leader.id = data;
   node.leader = leader.id == node.id;
 });
