@@ -160,18 +160,6 @@ function App() {
                 className="z-1 absolute h-[36rem] w-[64rem]"
               />
             </div>
-
-            {src && (
-              <>
-                <h1 className="mt-[100rem] w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
-                  Result
-                </h1>
-                <canvas
-                  ref={displayRef}
-                  className="mx-40 aspect-video bg-blue-200"
-                />
-              </>
-            )}
           </div>
         </div>
       </div>
