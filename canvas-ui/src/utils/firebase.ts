@@ -1,6 +1,14 @@
 import { FIREBASE_API_KEY, leader, node, nodeID } from "@/consts/config";
 import { initializeApp } from "firebase/app";
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import {
+  child,
+  get,
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  set,
+} from "firebase/database";
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -22,7 +30,20 @@ export const registerNode = async () => {
   }
   setInterval(async () => {
     set(ref(db, "nodes/" + node.id), new Date().toJSON());
-  }, 1000);
+  }, 500);
+};
+
+export const uploadState = async (state: string) => {
+  set(ref(db, "canvas-state"), state);
+};
+
+export const downloadState = async () => {
+  const snapshot = await get(child(ref(db), "canvas-state"));
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    return null;
+  }
 };
 
 onValue(ref(db, "leader"), (snapshot) => {

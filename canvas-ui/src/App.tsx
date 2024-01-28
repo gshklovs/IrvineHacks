@@ -12,7 +12,7 @@ import {
   drawLine,
   drawLineNoRace,
 } from "./utils/drawingUtils";
-import { registerNode } from "./utils/firebase";
+import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -57,17 +57,37 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        // drawLine(canvasRef, i, x, y);xw
+        // drawLine(canvasRef, i, x, y);
         drawLineNoRace(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
       }
-      if (node.leader) {
-        // TODO: Send canvas state to firebase
-      }
     }
     drawHoverCircle(transparentCanvasRef, json);
   });
+
+  const recoverCanvasState = async () => {
+    let state = await downloadState();
+    if (state != null) {
+      let ctx = canvasRef.current?.getContext("2d");
+      var img = new Image();
+      img.onload = function () {
+        if (ctx) ctx.drawImage(img, 0, 0);
+      };
+      img.src = state;
+    }
+  };
+
+  const saveCanvasState = () => {
+    setInterval(() => {
+      if (node.leader) {
+        let state = canvasRef.current?.toDataURL("image/png");
+        if (state != null) {
+          uploadState(state);
+        }
+      }
+    }, 2000);
+  };
 
   const DebugJsonComponent = ({ json }) => {
     return (
@@ -87,6 +107,8 @@ function App() {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
     registerNode();
+    recoverCanvasState();
+    saveCanvasState();
   }, []);
 
   return (
@@ -132,6 +154,7 @@ function App() {
               >
                 Leader: {leader.id} {node.leader ? "(ME)" : ""}
               </div>
+              <div>ID: {node.id}</div>
               Last Frame: {"["}
               {serverJSON.map((item, index) => {
                 return <DebugJsonComponent key={index} json={item} />;
