@@ -15,10 +15,15 @@ export default function calibrateCanvas(
       myCanvas.width,
       myCanvas.height,
     );
+    console.log("dimensions", dimensions);
     const dpr = window.devicePixelRatio || 1;
+    console.log("dpr", dpr);
     if (canvasRef.current) {
       canvasRef.current.width = dimensions.width * dpr;
       canvasRef.current.height = dimensions.height * dpr;
+
+      console.log("canvasRef.current.width", canvasRef.current.width);
+      console.log("canvasRef.current.height", canvasRef.current.height);
     }
 
     const ctx = myCanvas.getContext("2d");
@@ -27,8 +32,10 @@ export default function calibrateCanvas(
       myCanvas.clientWidth / originalWidth,
       myCanvas.clientHeight / originalHeight,
     );
+    console.log("ratio", ratio);
     if (ctx) {
       ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
+      console.log("ctx.scale", ratio * dpr, ratio * dpr);
     }
   }
 }

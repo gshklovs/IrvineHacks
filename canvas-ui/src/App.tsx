@@ -132,6 +132,16 @@ function App() {
                   Reset Canvas
                 </Button>
               </div>
+              <div className="m-1">
+                <Button onClick={() => {}} variant="secondary">
+                  Zoom Out
+                </Button>
+              </div>
+              <div className="m-1">
+                <Button onClick={() => {}} variant="secondary">
+                  Zoom In
+                </Button>
+              </div>
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
               <div
