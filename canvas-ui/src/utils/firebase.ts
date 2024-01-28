@@ -30,8 +30,9 @@ const db = getDatabase(app);
 
 export const registerNode = async () => {
   if (node.id === "") {
-    const id = push(ref(db, "nodes"), new Date().toJSON()).key;
-    node.id = id ?? "";
+    // const id = push(ref(db, "nodes"), new Date().toJSON()).key;
+    // node.id = id ?? "";
+    node.id = generateId();
   }
   setInterval(async () => {
     set(ref(db, "nodes/" + node.id), new Date().toJSON());
@@ -49,6 +50,13 @@ export const downloadState = async () => {
   } else {
     return null;
   }
+};
+
+const generateId = () => {
+  const id = Math.floor(10000000 + Math.random() * 90000000)
+    .toString()
+    .substring(0, 6);
+  return id;
 };
 
 // Listen for leader changes

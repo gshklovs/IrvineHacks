@@ -25,7 +25,7 @@ const socket = io(`wss://${BACKEND_SOCKET_URL}`);
 function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
-  const [showDebug, setShowDebug] = React.useState(false);
+  const [showDebug, setShowDebug] = React.useState(true);
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -94,8 +94,8 @@ function App() {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
     registerNode();
-    recoverCanvasState();
-    saveCanvasState();
+    // recoverCanvasState();
+    // saveCanvasState();
   }, []);
 
   return (
@@ -141,24 +141,14 @@ function App() {
                   Reset Canvas
                 </Button>
               </div>
-              <div className="m-1">
-                <Button onClick={() => {}} variant="secondary">
-                  Zoom Out
-                </Button>
-              </div>
-              <div className="m-1">
-                <Button onClick={() => {}} variant="secondary">
-                  Zoom In
-                </Button>
-              </div>
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
               <div
                 className={`${node.leader ? "text-green-400" : "text-orange-400"}`}
               >
-                Leader: {leader.id} {node.leader ? "(ME)" : ""}
+                {/* Leader: {leader.id} {node.leader ? "(ME)" : ""} */}
               </div>
-              <div>ID: {node.id}</div>
+              {/* <div>ID: {node.id}</div> */}
               Last Frame: {"["}
               {serverJSON.map((item, index) => {
                 return <DebugJsonComponent key={index} json={item} />;
