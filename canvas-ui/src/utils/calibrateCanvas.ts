@@ -27,14 +27,14 @@ export default function calibrateCanvas(
     }
 
     const ctx = myCanvas.getContext("2d");
-    console.log("ctx in rescale", ctx);
     const ratio = Math.min(
       myCanvas.clientWidth / originalWidth,
       myCanvas.clientHeight / originalHeight,
     );
     console.log("ratio", ratio);
     if (ctx) {
-      ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
+      // ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
+      ctx.scale(1, 1);
       console.log("ctx.scale", ratio * dpr, ratio * dpr);
     }
   }
