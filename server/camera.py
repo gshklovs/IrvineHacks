@@ -28,6 +28,10 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 
 recognition_result_list = []
 coordinate_list = []
+for i in range(int(num_hands)):
+    coordinate_list.append([])
+
+print("Initialized coordinate list: " + str(coordinate_list))
 
 def print_result(recognition_result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
     # print('gesture recognition result: {}'.format(recognition_result))
@@ -41,7 +45,7 @@ def start_camera():
     options = GestureRecognizerOptions(
         base_options=BaseOptions(model_asset_path=model_path),
         running_mode=VisionRunningMode.LIVE_STREAM,
-        num_hands=2,
+        num_hands=int(num_hands),
         min_hand_detection_confidence=0.4,
         min_hand_presence_confidence=0.5,
         min_tracking_confidence=0.5,
@@ -91,8 +95,8 @@ def start_camera():
                         cv2.line(annotated_image, (50, 200 + (hand_index * 60)), (50 + int(hand_landmarks[0].x * 100), 200 + (hand_index * 60)), (0, 0, 0), 2)
                         cv2.line(annotated_image, (50, 250 + (hand_index * 60)), (50, 250 + int(hand_landmarks[0].y * 100) + (hand_index * 60)), (0, 0, 0), 2)
 
-                        coordinate_list.append([hand_center_x, hand_center_y, top_gesture.category_name, datetime.utcnow()])
-                        # ws_send_message("{\"x\": " + str(hand_center_x) + ", \"y\": " + str(hand_center_y) + "}")
+                        coordinate_list[hand_index].append([hand_center_x, hand_center_y, top_gesture.category_name, datetime.utcnow()])
+                        # print("Hand Index: " + str(hand_index) + " - added coordinates: (" + str(hand_center_x) + "," + str(hand_center_y) + ") - Gesture: " + str(top_gesture.category_name))
 
                     recognition_result_list.clear()
                     image = annotated_image
@@ -100,16 +104,32 @@ def start_camera():
                 cv2.imshow('MediaPipe Gesture Recognizer', image)
                 if cv2.waitKey(5) & 0xFF == 27:
                     break
+
 def send_coordinates():
+    last_msg = ""
     global coordinate_list
     while True:
-        if coordinate_list:
-            coordinate = coordinate_list.pop()
-            ttl = (datetime.utcnow() - coordinate[3]).total_seconds() * 1000
-            if ttl < float(polling_rate):
-                ws_send_message(f"{{\"x\": {coordinate[0]}, \"y\": {coordinate[1]}, \"gesture\": \"{coordinate[2]}\", \"timestamp\": \"{coordinate[3]}\"}}")
-                print(f"sent coordinates: ({coordinate[0]},{coordinate[1]}) - Gesture: {coordinate[2]} - Age: {ttl}ms")
-            else:
-                print("coordinates expired, clearing stack")
-                coordinate_list.clear()
+        msg = "["
+        for i in range(int(num_hands)):
+            if coordinate_list[i] != []:
+                coords = coordinate_list[i].pop()
+                age = (datetime.utcnow() - coords[3]).total_seconds() * 1000
+                if age < float(polling_rate):
+                    msg += coordinate_frame_to_json(coords) + ","
+                    print("Hand Index: " + str(i) + " - (" + str(coords[0]) + "," + str(coords[1]) + ") - Gesture: " + str(coords[2]))
+                else:
+                    print("coordinates expired, clearing stack")
+                    coordinate_list[i].clear()
+                    
+        if msg.endswith(","):
+            msg = msg[:-1] + "]"
+        else:
+            msg += "]"
+        
+        if msg != last_msg:
+            ws_send_message(msg)
+            last_msg = msg
         time.sleep(float(polling_rate) / 1000)
+
+def coordinate_frame_to_json(frame):
+    return "{\"x\": " + str(frame[0]) + ", \"y\": " + str(frame[1]) + ", \"gesture\": \"" + str(frame[2]) + "\", \"timestamp\": \"" + str(frame[3]) + "\"}"

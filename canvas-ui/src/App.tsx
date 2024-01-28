@@ -1,103 +1,101 @@
 import "./App.css";
 import React from "react";
 import { useToast } from "./components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL } from "./consts/config";
-import getObjectFitSize from "./utils/getObjectFitSize";
-import openPalm from "./assets/open_palm.png";
+import {
+  BACKEND_SOCKET_URL,
+  lastCoords,
+  leader,
+  node,
+  shouldClearCanvas,
+} from "./consts/config";
+import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
-import getRandomColor from "./utils/getRandomColor";
 import calibrateCanvas from "./utils/calibrateCanvas";
 import {
+  clearCanvas,
   drawHoverCircle,
-  drawPoint,
-  clearTransparentCanvas,
+  drawLineNoRace,
 } from "./utils/drawingUtils";
+import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
-const socket = io(`ws://${BACKEND_SOCKET_URL}`);
+const socket = io(`wss://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
-  const [serverJSON, setServerJSON] = React.useState({} as any);
-  const [showDebug, setShowDebug] = React.useState(true);
-  const [src, setSrc] = React.useState("");
-  // const [lastX, setLastX] = React.useState(10);
-  // const [lastY, setLastY] = React.useState(100);
-  var lastX = 0.5;
-  var lastY = 0.5;
-  console.log("Rerender");
-
-  const sendToServer = () => {
-    socket.emit("to-server", "hello");
-    toast({
-      title: "Success",
-      description: "Sent message to server",
-      duration: 5000,
-    });
-  };
+  const [serverJSON, setServerJSON] = React.useState([]);
+  const [showDebug, setShowDebug] = React.useState(false);
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
-  const displayRef = React.useRef<HTMLCanvasElement>(null);
 
-  const drawLine = (
-    canvasRef: React.RefObject<HTMLCanvasElement>,
-    x: number,
-    y: number,
-  ) => {
-    if (canvasRef.current && lastX != x && lastY != y) {
-      let canvas = canvasRef.current;
-      let ctx = canvas ? canvas.getContext("2d") : null;
-      let width = canvas?.width;
-      let height = canvas?.height;
-      console.log(
-        "line from ",
-        lastX.toFixed(2),
-        lastY.toFixed(2),
-        " to ",
-        x.toFixed(2),
-        y.toFixed(2),
-      );
-      if (ctx) {
-        //choose a random color
-        ctx.strokeStyle = getRandomColor();
-        ctx.beginPath();
-        ctx.moveTo(lastX * width, lastY * height);
-        ctx.lineTo(x * width, y * height);
-        ctx.stroke();
+  socket.on("from-server", (msg) => {
+    const json = JSON.parse(msg);
+    setServerJSON(json);
+    let cur_hand;
+    let x: number;
+    let y: number;
+    for (let i = 0; i < json.length; i++) {
+      cur_hand = json[i];
+      x = cur_hand["x"];
+      y = cur_hand["y"];
+      if (json[i]["gesture"] == "Closed_Fist") {
+        // drawLine(canvasRef, i, x, y);
+        drawLineNoRace(canvasRef, i, x, y);
+      } else {
+        lastCoords[i] = { x: x, y: y };
       }
-      lastX = x;
-      lastY = y;
+    }
+    drawHoverCircle(transparentCanvasRef, json);
+  });
+
+  const recoverCanvasState = async () => {
+    const state = await downloadState();
+    if (state != null) {
+      const ctx = canvasRef.current?.getContext("2d");
+      const img = new Image();
+      img.onload = function () {
+        if (ctx) ctx.drawImage(img, 0, 0);
+      };
+      img.src = state;
     }
   };
 
-  function displayImage(canvasRef: React.RefObject<HTMLCanvasElement>) {
-    if (canvasRef.current) {
-      let canvas = canvasRef.current;
-      setSrc(canvas.toDataURL("image/png"));
-      var img = new Image();
-      img.src = src;
-      displayRef.current?.getContext("2d")?.drawImage(img, 0, 0);
-      console.log("src", src);
-    }
-  }
+  const saveCanvasState = () => {
+    setInterval(() => {
+      if (node.leader) {
+        const state = canvasRef.current?.toDataURL("image/png");
+        if (state != null) {
+          uploadState(state);
+        }
+      } else if (shouldClearCanvas.value) {
+        clearCanvas(canvasRef);
+        shouldClearCanvas.value = false;
+      }
+    }, 1000);
+  };
 
-  socket.on("from-server", (msg) => {
-    var json = JSON.parse(msg);
-    setServerJSON(json);
-    if (json["gesture"] == "Closed_Fist") {
-      drawLine(canvasRef, json["x"], json["y"]);
-      clearTransparentCanvas(transparentCanvasRef);
-    } else {
-      drawHoverCircle(transparentCanvasRef, json["x"], json["y"]);
-    }
-  });
+  const DebugJsonComponent = ({ json }: { json: any }) => {
+    return (
+      <div className="ml-4">
+        {"{"}
+        {Object.keys(json).map((key) => (
+          <p className="ml-4" key={key}>
+            {key}: {json[key]}
+          </p>
+        ))}
+        {"},"}
+      </div>
+    );
+  };
 
   React.useEffect(() => {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
+    registerNode();
+    recoverCanvasState();
+    saveCanvasState();
   }, []);
 
   return (
@@ -127,24 +125,45 @@ function App() {
                 </Button>
               </div>
               <div className="m-1">
-                <Button onClick={sendToServer} variant="secondary">
-                  Send Message
+                <Button
+                  onClick={() => {
+                    if (node.leader) {
+                      clearCanvas(canvasRef);
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "Only the leader can reset the canvas!",
+                      });
+                    }
+                  }}
+                  variant={node.leader ? "secondary" : "outline"}
+                >
+                  Reset Canvas
                 </Button>
               </div>
               <div className="m-1">
-                <Button onClick={displayImage} variant="secondary">
-                  Display Image
+                <Button onClick={() => {}} variant="secondary">
+                  Zoom Out
+                </Button>
+              </div>
+              <div className="m-1">
+                <Button onClick={() => {}} variant="secondary">
+                  Zoom In
                 </Button>
               </div>
             </div>
             <pre className={`m-4 ${showDebug ? "visible" : "hidden"}`}>
-              Debug: {"{"}
-              {Object.keys(serverJSON).map((key, index) => (
-                <p className="ml-4" key={index}>
-                  {key}: {serverJSON[key]}
-                </p>
-              ))}
-              {"}"}
+              <div
+                className={`${node.leader ? "text-green-400" : "text-orange-400"}`}
+              >
+                Leader: {leader.id} {node.leader ? "(ME)" : ""}
+              </div>
+              <div>ID: {node.id}</div>
+              Last Frame: {"["}
+              {serverJSON.map((item, index) => {
+                return <DebugJsonComponent key={index} json={item} />;
+              })}
+              {"]"}
               <br />
             </pre>
             <div className="z-0 mt-4 h-[36rem] w-[64rem] border border-yellow-50">
@@ -159,18 +178,6 @@ function App() {
                 className="z-1 absolute h-[36rem] w-[64rem]"
               />
             </div>
-
-            {src && (
-              <>
-                <h1 className="mt-[100rem] w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
-                  Result
-                </h1>
-                <canvas
-                  ref={displayRef}
-                  className="mx-40 aspect-video bg-blue-200"
-                />
-              </>
-            )}
           </div>
         </div>
       </div>

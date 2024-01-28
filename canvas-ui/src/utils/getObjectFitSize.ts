@@ -1,15 +1,15 @@
 export default function getObjectFitSize(
-  contains: Boolean /* true = contain, false = cover */,
+  contains: boolean /* true = contain, false = cover */,
   containerWidth: number,
   containerHeight: number,
   width: number,
   height: number,
 ) {
-  var doRatio = width / height;
-  var cRatio = containerWidth / containerHeight;
-  var targetWidth = 0;
-  var targetHeight = 0;
-  var test = contains ? doRatio > cRatio : doRatio < cRatio;
+  const doRatio = width / height;
+  const cRatio = containerWidth / containerHeight;
+  let targetWidth = 0;
+  let targetHeight = 0;
+  const test = contains ? doRatio > cRatio : doRatio < cRatio;
 
   if (test) {
     targetWidth = containerWidth;
