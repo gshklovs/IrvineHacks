@@ -5,15 +5,7 @@ import {
   shouldClearCanvas,
 } from "@/consts/config";
 import { initializeApp } from "firebase/app";
-import {
-  child,
-  get,
-  getDatabase,
-  onValue,
-  push,
-  ref,
-  set,
-} from "firebase/database";
+import { child, get, getDatabase, onValue, ref, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
