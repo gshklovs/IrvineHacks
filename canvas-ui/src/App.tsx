@@ -7,7 +7,11 @@ import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
-import { drawHoverCircle, drawLine } from "./utils/drawingUtils";
+import {
+  drawHoverCircle,
+  drawLine,
+  drawLineNoRace,
+} from "./utils/drawingUtils";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -52,7 +56,8 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        drawLine(canvasRef, i, x, y);
+        // drawLine(canvasRef, i, x, y);
+        drawLineNoRace(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
       }

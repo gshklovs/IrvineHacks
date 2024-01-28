@@ -49,6 +49,43 @@ export const drawLine = (
   }
 };
 
+export const drawLineNoRace = (
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  index: number,
+  x: number,
+  y: number,
+) => {
+  if (canvasRef.current) {
+    let canvas = canvasRef.current;
+    let ctx = canvas ? canvas.getContext("2d") : null;
+    let width = canvas?.width;
+    let height = canvas?.height;
+    let closestCoordIndex = 0;
+    for (let i = 0; i < lastCoords.length; i++) {
+      let lastCoord = lastCoords[i];
+      if (
+        Math.abs(lastCoord.x - x) <
+        Math.abs(lastCoords[closestCoordIndex].x - x)
+      ) {
+        closestCoordIndex = i;
+      }
+    }
+    if (ctx) {
+      //choose a random color
+      ctx.strokeStyle = handColors[index];
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(
+        lastCoords[closestCoordIndex].x * width,
+        lastCoords[closestCoordIndex].y * height,
+      );
+      ctx.lineTo(x * width, y * height);
+      ctx.stroke();
+    }
+    lastCoords[closestCoordIndex] = { x: x, y: y };
+  }
+};
+
 export const drawPoint = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
   x: number,
