@@ -15,7 +15,7 @@ const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
-  const [showDebug, setShowDebug] = React.useState(true);
+  const [showDebug, setShowDebug] = React.useState(false);
   const [src, setSrc] = React.useState("");
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
