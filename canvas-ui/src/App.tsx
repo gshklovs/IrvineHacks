@@ -20,31 +20,10 @@ function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
   const [showDebug, setShowDebug] = React.useState(false);
-  const [src, setSrc] = React.useState("");
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const displayRef = React.useRef<HTMLCanvasElement>(null);
-
-  const sendToServer = () => {
-    socket.emit("to-server", "hello");
-    toast({
-      title: "Success",
-      description: "Sent message to server",
-      duration: 5000,
-    });
-  };
-
-  function displayImage() {
-    if (displayRef.current) {
-      const canvas = displayRef.current;
-      setSrc(canvas.toDataURL("image/png"));
-      const img = new Image();
-      img.src = src;
-      displayRef.current?.getContext("2d")?.drawImage(img, 0, 0);
-      console.log("src", src);
-    }
-  }
 
   socket.on("from-server", (msg) => {
     const json = JSON.parse(msg);
