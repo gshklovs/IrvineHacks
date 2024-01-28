@@ -1,10 +1,7 @@
 import openPalm from "../../assets/open_palm1.png";
 import closedFist from "../../assets/closed_fist.png";
 
-export default function Legend(
-  handColorIds,
-  // setHandColorIds: React.Dispatch<React.SetStateAction<number[]>>,
-) {
+const Legend = ({ handColorIds }: { handColorIds: any[] }) => {
   return (
     <div className="z-2 w-70 absolute right-0 top-0 m-8 min-h-48 rounded-xl border-2 border-yellow-600 bg-slate-500 bg-opacity-50 p-4">
       <p className="pb-2 text-2xl text-white opacity-100">
@@ -59,4 +56,6 @@ export default function Legend(
       </div>
     </div>
   );
-}
+};
+
+export default Legend;
