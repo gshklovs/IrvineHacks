@@ -16,7 +16,7 @@ import calibrateCanvas from "./utils/calibrateCanvas";
 import {
   clearCanvas,
   drawHoverCircle,
-  drawLineNoRace,
+  drawLine,
 } from "./utils/drawingUtils";
 import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
@@ -41,7 +41,7 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        drawLineNoRace(canvasRef, i, x, y);
+        drawLine(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
       }

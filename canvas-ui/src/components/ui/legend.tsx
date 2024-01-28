@@ -8,7 +8,7 @@ const Legend = ({ handColorIds }: { handColorIds: any[] }) => {
         Draw With Your Hands
       </p>
       <p className="text-lg font-bold text-white opacity-100">
-        Find your cursor:{" "}
+        Find your cursor:{handColorIds[0]}
       </p>
       <img className="right-0 m-2 inline-block h-12 invert" src={openPalm} />
       <p className="inline-block text-white opacity-100">Open Palm</p>

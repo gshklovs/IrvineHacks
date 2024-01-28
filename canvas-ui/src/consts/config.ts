@@ -18,6 +18,8 @@ export const lastCoords = [
   { x: 0, y: 0 },
 ];
 
+export const lastActions = [[], [], [], [], [], []];
+
 export const handColors = [
   "red",
   "blue",
