@@ -13,19 +13,15 @@ import {
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
-import {
-  clearCanvas,
-  drawHoverCircle,
-  drawLineNoRace,
-} from "./utils/drawingUtils";
+import { clearCanvas, drawHoverCircle, drawLine } from "./utils/drawingUtils";
 import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
-const socket = io(`wss://${BACKEND_SOCKET_URL}`);
+const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
   const [serverJSON, setServerJSON] = React.useState([]);
-  const [showDebug, setShowDebug] = React.useState(true);
+  const [showDebug, setShowDebug] = React.useState(false);
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -41,7 +37,7 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        drawLineNoRace(canvasRef, i, x, y);
+        drawLine(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
       }
@@ -103,7 +99,7 @@ function App() {
         <div className="h-screen w-full overflow-y-auto bg-black">
           <div className="flex flex-col p-16">
             <h1 className="w-full text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
-              Canvas
+              Canvas (Placeholder)
             </h1>
             <div className="z-2 absolute right-0 top-0 m-8 min-h-48 w-64 rounded-xl border-2 border-yellow-700 bg-slate-500 bg-opacity-50 p-4">
               <p className="pb-2 text-2xl text-white opacity-100">
