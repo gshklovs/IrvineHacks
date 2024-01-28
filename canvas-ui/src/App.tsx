@@ -7,11 +7,7 @@ import { BACKEND_SOCKET_URL, lastCoords, leader, node } from "./consts/config";
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
-import {
-  drawHoverCircle,
-  drawLine,
-  drawLineNoRace,
-} from "./utils/drawingUtils";
+import { drawHoverCircle, drawLineNoRace } from "./utils/drawingUtils";
 import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
@@ -37,9 +33,9 @@ function App() {
 
   function displayImage() {
     if (displayRef.current) {
-      let canvas = displayRef.current;
+      const canvas = displayRef.current;
       setSrc(canvas.toDataURL("image/png"));
-      var img = new Image();
+      const img = new Image();
       img.src = src;
       displayRef.current?.getContext("2d")?.drawImage(img, 0, 0);
       console.log("src", src);
@@ -47,12 +43,12 @@ function App() {
   }
 
   socket.on("from-server", (msg) => {
-    var json = JSON.parse(msg);
+    const json = JSON.parse(msg);
     setServerJSON(json);
-    var cur_hand;
-    var x: number;
-    var y: number;
-    for (var i = 0; i < json.length; i++) {
+    let cur_hand;
+    let x: number;
+    let y: number;
+    for (let i = 0; i < json.length; i++) {
       cur_hand = json[i];
       x = cur_hand["x"];
       y = cur_hand["y"];
@@ -67,10 +63,10 @@ function App() {
   });
 
   const recoverCanvasState = async () => {
-    let state = await downloadState();
+    const state = await downloadState();
     if (state != null) {
-      let ctx = canvasRef.current?.getContext("2d");
-      var img = new Image();
+      const ctx = canvasRef.current?.getContext("2d");
+      const img = new Image();
       img.onload = function () {
         if (ctx) ctx.drawImage(img, 0, 0);
       };
@@ -81,7 +77,7 @@ function App() {
   const saveCanvasState = () => {
     setInterval(() => {
       if (node.leader) {
-        let state = canvasRef.current?.toDataURL("image/png");
+        const state = canvasRef.current?.toDataURL("image/png");
         if (state != null) {
           uploadState(state);
         }

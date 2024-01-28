@@ -7,8 +7,8 @@ export default function calibrateCanvas(
   if (canvasRef.current) {
     const originalHeight = canvasRef.current?.height;
     const originalWidth = canvasRef.current?.width;
-    var myCanvas = canvasRef.current;
-    let dimensions = getObjectFitSize(
+    const myCanvas = canvasRef.current;
+    const dimensions = getObjectFitSize(
       true,
       myCanvas.clientWidth,
       myCanvas.clientHeight,
@@ -21,9 +21,9 @@ export default function calibrateCanvas(
       canvasRef.current.height = dimensions.height * dpr;
     }
 
-    let ctx = myCanvas.getContext("2d");
+    const ctx = myCanvas.getContext("2d");
     console.log("ctx in rescale", ctx);
-    let ratio = Math.min(
+    const ratio = Math.min(
       myCanvas.clientWidth / originalWidth,
       myCanvas.clientHeight / originalHeight,
     );

@@ -2,19 +2,19 @@ import { handColors, lastCoords } from "@/consts/config";
 
 export const drawHoverCircle = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
-  hands: Array<Object>,
+  hands: Array<object>,
 ) => {
   if (canvasRef.current) {
-    let canvas = canvasRef.current;
-    let width = canvas?.width;
-    let height = canvas?.height;
-    let ctx = canvas ? canvas.getContext("2d") : null;
+    const canvas = canvasRef.current;
+    const width = canvas?.width;
+    const height = canvas?.height;
+    const ctx = canvas ? canvas.getContext("2d") : null;
     if (ctx) {
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < hands.length; i++) {
-        let hand = hands[i];
-        let x = hand.x;
-        let y = hand.y;
+        const hand = hands[i];
+        const x = hand.x;
+        const y = hand.y;
         ctx.strokeStyle = handColors[i];
         ctx.beginPath();
         ctx.lineWidth = 2;
@@ -32,10 +32,10 @@ export const drawLine = (
   y: number,
 ) => {
   if (canvasRef.current) {
-    let canvas = canvasRef.current;
-    let ctx = canvas ? canvas.getContext("2d") : null;
-    let width = canvas?.width;
-    let height = canvas?.height;
+    const canvas = canvasRef.current;
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    const width = canvas?.width;
+    const height = canvas?.height;
     if (ctx) {
       //choose a random color
       ctx.strokeStyle = handColors[index];
@@ -56,13 +56,13 @@ export const drawLineNoRace = (
   y: number,
 ) => {
   if (canvasRef.current) {
-    let canvas = canvasRef.current;
-    let ctx = canvas ? canvas.getContext("2d") : null;
-    let width = canvas?.width;
-    let height = canvas?.height;
+    const canvas = canvasRef.current;
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    const width = canvas?.width;
+    const height = canvas?.height;
     let closestCoordIndex = 0;
     for (let i = 0; i < lastCoords.length; i++) {
-      let lastCoord = lastCoords[i];
+      const lastCoord = lastCoords[i];
       if (
         Math.abs(lastCoord.x - x) <
         Math.abs(lastCoords[closestCoordIndex].x - x)
@@ -92,10 +92,10 @@ export const drawPoint = (
   y: number,
 ) => {
   if (canvasRef.current) {
-    let canvas = canvasRef.current;
-    let ctx = canvas ? canvas.getContext("2d") : null;
-    let width = canvas?.width;
-    let height = canvas?.height;
+    const canvas = canvasRef.current;
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    const width = canvas?.width;
+    const height = canvas?.height;
     if (ctx) {
       ctx.beginPath();
       ctx.fillStyle = "black";
@@ -109,10 +109,10 @@ export const clearTransparentCanvas = (
   transparentCanvasRef: React.RefObject<HTMLCanvasElement>,
 ) => {
   if (transparentCanvasRef.current) {
-    let canvas = transparentCanvasRef.current;
-    let ctx = canvas ? canvas.getContext("2d") : null;
-    let width = canvas?.width;
-    let height = canvas?.height;
+    const canvas = transparentCanvasRef.current;
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    const width = canvas?.width;
+    const height = canvas?.height;
     if (ctx) {
       ctx.clearRect(0, 0, width, height);
     }

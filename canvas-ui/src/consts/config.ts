@@ -4,10 +4,10 @@ export const BACKEND_SOCKET_URL =
 export const FIREBASE_API_KEY =
   import.meta.env.VITE_FIREBASE_API_KEY ?? "MISSING FIREBASE API KEY";
 
-export var node = { id: "", leader: false };
-export var leader = { id: "" };
+export const node = { id: "", leader: false };
+export const leader = { id: "" };
 
-export var lastCoords = [
+export const lastCoords = [
   { x: 0, y: 0 },
   { x: 0, y: 0 },
   { x: 0, y: 0 },
@@ -16,7 +16,7 @@ export var lastCoords = [
   { x: 0, y: 0 },
 ];
 
-export var handColors = [
+export const handColors = [
   "red",
   "blue",
   "green",

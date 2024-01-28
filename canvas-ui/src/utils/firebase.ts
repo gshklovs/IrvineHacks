@@ -1,4 +1,4 @@
-import { FIREBASE_API_KEY, leader, node, nodeID } from "@/consts/config";
+import { FIREBASE_API_KEY, leader, node } from "@/consts/config";
 import { initializeApp } from "firebase/app";
 import {
   child,
@@ -25,7 +25,7 @@ const db = getDatabase(app);
 
 export const registerNode = async () => {
   if (node.id === "") {
-    let id = push(ref(db, "nodes"), new Date().toJSON()).key;
+    const id = push(ref(db, "nodes"), new Date().toJSON()).key;
     node.id = id ?? "";
   }
   setInterval(async () => {
