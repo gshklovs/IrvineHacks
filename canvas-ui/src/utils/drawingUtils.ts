@@ -1,4 +1,5 @@
 import { handColors, lastCoords } from "@/consts/config";
+import { uploadState } from "./firebase";
 
 export const drawHoverCircle = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -113,6 +114,7 @@ export const clearCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const height = canvas?.height;
     if (ctx) {
       ctx.clearRect(0, 0, width, height);
+      uploadState("empty");
     }
   }
 };

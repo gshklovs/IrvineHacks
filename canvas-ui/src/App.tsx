@@ -3,7 +3,13 @@ import React from "react";
 import { useToast } from "./components/ui/use-toast";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
-import { BACKEND_SOCKET_URL, lastCoords, leader, node } from "./consts/config";
+import {
+  BACKEND_SOCKET_URL,
+  lastCoords,
+  leader,
+  node,
+  shouldClearCanvas,
+} from "./consts/config";
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
@@ -63,6 +69,9 @@ function App() {
         if (state != null) {
           uploadState(state);
         }
+      } else if (shouldClearCanvas.value) {
+        clearCanvas(canvasRef);
+        shouldClearCanvas.value = false;
       }
     }, 2000);
   };

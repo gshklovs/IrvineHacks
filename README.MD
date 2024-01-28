@@ -10,7 +10,8 @@ React app to display and update the actual canvas.
 
 #### Env Vars
 
-- `VITE_VITE_BACKEND_SOCKET_URL`: Specify an alternate backend websocket url (defaults to `localhost:30000`)
+- `VITE_BACKEND_SOCKET_URL`: Specify an alternate backend websocket url (defaults to `localhost:30000`)
+- `VITE_FIREBASE_API_KEY`: Specify the Firebase project API key (defaults to `KEY_MISSING`)
 
 ### `server`
 

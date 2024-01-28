@@ -1,4 +1,9 @@
-import { FIREBASE_API_KEY, leader, node } from "@/consts/config";
+import {
+  FIREBASE_API_KEY,
+  leader,
+  node,
+  shouldClearCanvas,
+} from "@/consts/config";
 import { initializeApp } from "firebase/app";
 import {
   child,
@@ -46,9 +51,18 @@ export const downloadState = async () => {
   }
 };
 
+// Listen for leader changes
 onValue(ref(db, "leader"), (snapshot) => {
   const data = snapshot.val();
   console.log("leader: ", data);
   leader.id = data;
   node.leader = leader.id == node.id;
+});
+
+// Listen for canvas state changes
+onValue(ref(db, "canvas-state"), (snapshot) => {
+  const data = snapshot.val();
+  if (data == "empty") {
+    shouldClearCanvas.value = true;
+  }
 });

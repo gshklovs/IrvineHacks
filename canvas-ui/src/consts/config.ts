@@ -7,6 +7,8 @@ export const FIREBASE_API_KEY =
 export const node = { id: "", leader: false };
 export const leader = { id: "" };
 
+export const shouldClearCanvas = { value: false };
+
 export const lastCoords = [
   { x: 0, y: 0 },
   { x: 0, y: 0 },
