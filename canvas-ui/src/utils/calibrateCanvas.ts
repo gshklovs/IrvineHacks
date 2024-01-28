@@ -15,6 +15,8 @@ export default function calibrateCanvas(
       myCanvas.width,
       myCanvas.height,
     );
+    console.log("originalWidth", originalWidth);
+    console.log("originalHeight", originalHeight);
     console.log("dimensions", dimensions);
     const dpr = window.devicePixelRatio || 1;
     console.log("dpr", dpr);
