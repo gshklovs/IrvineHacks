@@ -1,6 +1,6 @@
 import { FIREBASE_API_KEY, leader, node, nodeID } from "@/consts/config";
 import { initializeApp } from "firebase/app";
-import { child, get, getDatabase, push, ref, set } from "firebase/database";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -21,20 +21,13 @@ export const registerNode = async () => {
     node.id = id ?? "";
   }
   setInterval(async () => {
-    // await updateDoc(doc(db, `nodes/${node.id}`), {
-    //   age: new Date(),
-    // });
+    set(ref(db, "nodes/" + node.id), new Date().toJSON());
   }, 1000);
 };
 
-// const listenForLeader = onSnapshot(doc(db, "nodes/leader"), (doc) => {
-//   if (doc.exists()) {
-//     let leaderId = doc.data().id;
-//     console.log("New leader: ", leaderId);
-//     if (leaderId === node.id) {
-//       node.leader = true;
-//       console.log("I am the leader!");
-//     }
-//     leader.id = leaderId;
-//   }
-// });
+onValue(ref(db, "leader"), (snapshot) => {
+  const data = snapshot.val();
+  console.log("leader: ", data);
+  leader.id = data;
+  node.leader = leader.id == node.id;
+});

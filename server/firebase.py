@@ -53,5 +53,3 @@ def start_leader_consensus():
             pick_new_leader()
 
         time.sleep(0.5)
-
-start_leader_consensus()
