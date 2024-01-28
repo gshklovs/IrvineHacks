@@ -41,7 +41,6 @@ function App() {
       x = cur_hand["x"];
       y = cur_hand["y"];
       if (json[i]["gesture"] == "Closed_Fist") {
-        // drawLine(canvasRef, i, x, y);
         drawLineNoRace(canvasRef, i, x, y);
       } else {
         lastCoords[i] = { x: x, y: y };
@@ -94,8 +93,8 @@ function App() {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
     registerNode();
-    // recoverCanvasState();
-    // saveCanvasState();
+    recoverCanvasState();
+    saveCanvasState();
   }, []);
 
   return (
@@ -146,9 +145,9 @@ function App() {
               <div
                 className={`${node.leader ? "text-green-400" : "text-orange-400"}`}
               >
-                {/* Leader: {leader.id} {node.leader ? "(ME)" : ""} */}
+                Leader: {leader.id} {node.leader ? "(ME)" : ""}
               </div>
-              {/* <div>ID: {node.id}</div> */}
+              <div>ID: {node.id}</div>
               Last Frame: {"["}
               {serverJSON.map((item, index) => {
                 return <DebugJsonComponent key={index} json={item} />;
