@@ -1,3 +1,0 @@
-[submodule "server/grmodel"]
-	path = server/grmodel
-	url = https://github.com/rovirmani/hand-gesture-recognition-mediapipe
