@@ -2,7 +2,7 @@ import { handColors, lastCoords } from "@/consts/config";
 
 export const drawHoverCircle = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
-  hands: Array<object>,
+  hands: Array<any>,
 ) => {
   if (canvasRef.current) {
     const canvas = canvasRef.current;

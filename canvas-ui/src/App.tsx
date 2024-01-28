@@ -23,7 +23,6 @@ function App() {
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const transparentCanvasRef = React.useRef<HTMLCanvasElement>(null);
-  const displayRef = React.useRef<HTMLCanvasElement>(null);
 
   socket.on("from-server", (msg) => {
     const json = JSON.parse(msg);
@@ -68,7 +67,7 @@ function App() {
     }, 2000);
   };
 
-  const DebugJsonComponent = ({ json }) => {
+  const DebugJsonComponent = ({ json }: { json: any }) => {
     return (
       <div className="ml-4">
         {"{"}
