@@ -3,6 +3,15 @@ import time
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore, db
+import os
+from dotenv import load_dotenv
+
+# ====== ENV VARIABLES ====== #
+load_dotenv()
+clear_no_connections = os.getenv("CLEAR_ON_NO_CONNECTIONS")
+if clear_no_connections == None:
+    clear_no_connections = 1
+# ============================ #
 
 cred = credentials.Certificate('firebase_service_account.json')
 default_app = firebase_admin.initialize_app(cred, {
@@ -49,6 +58,10 @@ def start_leader_consensus():
                     print("Deleted expired node: " + node)
         else:
             set_leader_id("none")
+            if int(clear_no_connections) == 1:
+                print("No active connections, clearing coordinates")
+                rtdb.child("canvas-state").delete()
+
         if not verify_leader_id():
             pick_new_leader()
 
