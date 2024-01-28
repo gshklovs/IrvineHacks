@@ -4,8 +4,8 @@ import { useToast } from "./components/ui/use-toast";
 import { io } from "socket.io-client";
 import { Button } from "./components/ui/button";
 import { BACKEND_SOCKET_URL, lastCoords } from "./consts/config";
-import openPalm from "./assets/open_palm.png";
-import closedFist from "./assets/closed_fist1.png";
+import openPalm from "./assets/open_palm1.png";
+import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
 import { drawHoverCircle, drawLine } from "./utils/drawingUtils";
 
