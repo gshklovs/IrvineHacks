@@ -7,28 +7,37 @@ export default function calibrateCanvas(
   if (canvasRef.current) {
     const originalHeight = canvasRef.current?.height;
     const originalWidth = canvasRef.current?.width;
-    var myCanvas = canvasRef.current;
-    let dimensions = getObjectFitSize(
+    const myCanvas = canvasRef.current;
+    const dimensions = getObjectFitSize(
       true,
       myCanvas.clientWidth,
       myCanvas.clientHeight,
       myCanvas.width,
       myCanvas.height,
     );
+    console.log("originalWidth", originalWidth);
+    console.log("originalHeight", originalHeight);
+    console.log("dimensions", dimensions);
     const dpr = window.devicePixelRatio || 1;
+    console.log("dpr", dpr);
     if (canvasRef.current) {
       canvasRef.current.width = dimensions.width * dpr;
       canvasRef.current.height = dimensions.height * dpr;
+
+      console.log("canvasRef.current.width", canvasRef.current.width);
+      console.log("canvasRef.current.height", canvasRef.current.height);
     }
 
-    let ctx = myCanvas.getContext("2d");
-    console.log("ctx in rescale", ctx);
-    let ratio = Math.min(
+    const ctx = myCanvas.getContext("2d");
+    const ratio = Math.min(
       myCanvas.clientWidth / originalWidth,
       myCanvas.clientHeight / originalHeight,
     );
+    console.log("ratio", ratio);
     if (ctx) {
-      ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
+      // ctx.scale(ratio * dpr, ratio * dpr); //adjust this!
+      ctx.scale(1, 1);
+      console.log("ctx.scale", ratio * dpr, ratio * dpr);
     }
   }
 }

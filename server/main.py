@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO
 from socket_service import *
 from camera import *
+from firebase import *
 from dotenv import load_dotenv
 
 # ====== ENV VARIABLES ====== #
@@ -18,6 +19,8 @@ if __name__ == '__main__':
     server = initialize_socket(app)
     server_thread = threading.Thread(target=server.run, args=(app,), kwargs={'port': int(port)})
     server_thread.start()
+    firebase_thread = threading.Thread(target=start_leader_consensus)
+    firebase_thread.start()
     coordinate_thread = threading.Thread(target=send_coordinates)
     coordinate_thread.start()
     start_camera()
