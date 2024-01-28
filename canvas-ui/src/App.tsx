@@ -14,7 +14,7 @@ import {
 } from "./utils/drawingUtils";
 import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
-const socket = io(`ws://${BACKEND_SOCKET_URL}`);
+const socket = io(`wss://${BACKEND_SOCKET_URL}`);
 
 function App() {
   const { toast } = useToast();
