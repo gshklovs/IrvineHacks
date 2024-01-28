@@ -53,7 +53,7 @@ def start_leader_consensus():
         if nodes != None:
             for node in nodes:
                 age = (datetime.utcnow() - datetime.fromisoformat(nodes[node].replace('Z', '+00:00')).replace(tzinfo=None)).total_seconds()
-                if age > 1:
+                if age > 2:
                     rtdb.child("nodes").child(node).delete()
                     print("Deleted expired node: " + node)
         else:
