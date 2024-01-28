@@ -1,4 +1,5 @@
 import random
+import time
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore, db
@@ -42,7 +43,7 @@ def start_leader_consensus():
         nodes = rtdb.child("nodes").get()
         if nodes != None:
             for node in nodes:
-                age = (datetime.utcnow() - datetime.fromisoformat(nodes[node])).total_seconds()
+                age = (datetime.utcnow() - datetime.fromisoformat(nodes[node].replace('Z', '+00:00')).replace(tzinfo=None)).total_seconds()
                 if age > 2:
                     rtdb.child("nodes").child(node).delete()
                     print("Deleted expired node: " + node)
@@ -52,3 +53,5 @@ def start_leader_consensus():
             pick_new_leader()
 
         time.sleep(0.5)
+
+start_leader_consensus()

@@ -12,7 +12,7 @@ import {
   drawLine,
   drawLineNoRace,
 } from "./utils/drawingUtils";
-import { getNodes, registerNode } from "./utils/firebase";
+import { registerNode } from "./utils/firebase";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
 
@@ -86,7 +86,7 @@ function App() {
   React.useEffect(() => {
     calibrateCanvas(canvasRef);
     calibrateCanvas(transparentCanvasRef);
-    getNodes();
+    registerNode();
   }, []);
 
   return (
