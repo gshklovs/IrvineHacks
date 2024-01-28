@@ -2,8 +2,9 @@ import threading
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 from socket_service import *
-from camera import *
+#from camera import *
 from grmodel.app import main
+from grmodel.app import send_coordinates
 from dotenv import load_dotenv
 import os
 import sys
