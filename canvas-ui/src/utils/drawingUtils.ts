@@ -105,11 +105,9 @@ export const drawPoint = (
   }
 };
 
-export const clearTransparentCanvas = (
-  transparentCanvasRef: React.RefObject<HTMLCanvasElement>,
-) => {
-  if (transparentCanvasRef.current) {
-    const canvas = transparentCanvasRef.current;
+export const clearCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
+  if (canvasRef.current) {
+    const canvas = canvasRef.current;
     const ctx = canvas ? canvas.getContext("2d") : null;
     const width = canvas?.width;
     const height = canvas?.height;

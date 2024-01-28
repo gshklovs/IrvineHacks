@@ -7,7 +7,11 @@ import { BACKEND_SOCKET_URL, lastCoords, leader, node } from "./consts/config";
 import openPalm from "./assets/open_palm1.png";
 import closedFist from "./assets/closed_fist.png";
 import calibrateCanvas from "./utils/calibrateCanvas";
-import { drawHoverCircle, drawLineNoRace } from "./utils/drawingUtils";
+import {
+  clearCanvas,
+  drawHoverCircle,
+  drawLineNoRace,
+} from "./utils/drawingUtils";
 import { downloadState, registerNode, uploadState } from "./utils/firebase";
 
 const socket = io(`ws://${BACKEND_SOCKET_URL}`);
@@ -134,13 +138,20 @@ function App() {
                 </Button>
               </div>
               <div className="m-1">
-                <Button onClick={sendToServer} variant="secondary">
-                  Send Message
-                </Button>
-              </div>
-              <div className="m-1">
-                <Button onClick={displayImage} variant="secondary">
-                  Display Image
+                <Button
+                  onClick={() => {
+                    if (node.leader) {
+                      clearCanvas(canvasRef);
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "Only the leader can reset the canvas!",
+                      });
+                    }
+                  }}
+                  variant={node.leader ? "secondary" : "outline"}
+                >
+                  Reset Canvas
                 </Button>
               </div>
             </div>
