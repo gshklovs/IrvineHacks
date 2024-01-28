@@ -131,7 +131,7 @@ def send_coordinates():
             if coordinate_list[i] != []:
                 coords = coordinate_list[i].pop()
                 age = (datetime.utcnow() - coords[3]).total_seconds() * 1000
-                if age < float(polling_rate):
+                if age < float(polling_rate)**2 * (1/4):
                     msg += coordinate_frame_to_json(coords) + ","
                     print("Hand Index: " + str(i) + " - (" + str(coords[0]) + "," + str(coords[1]) + ") - Gesture: " + str(coords[2]))
                 else:
