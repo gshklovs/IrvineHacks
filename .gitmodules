@@ -1,0 +1,3 @@
+[submodule "server/grmodel"]
+	path = server/grmodel
+	url = https://github.com/kinivi/hand-gesture-recognition-mediapipe
