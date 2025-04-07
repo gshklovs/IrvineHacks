@@ -1,4 +1,4 @@
-# Canvas (cooler name incoming)
+# Canvas (cooler name not incoming)
 
 ### `canvas-ui`
 
